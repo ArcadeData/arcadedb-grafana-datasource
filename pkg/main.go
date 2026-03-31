@@ -6,7 +6,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 
-	"github.com/ArcadeData/arcadedb-grafana-datasource/pkg/plugin"
+	"github.com/arcadedb/arcadedb/pkg/plugin"
 )
 
 func main() {

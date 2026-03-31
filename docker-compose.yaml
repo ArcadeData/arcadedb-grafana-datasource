@@ -1,18 +1,8 @@
-version: '3.8'
-
 services:
   grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=arcadedb-arcadedb-datasource
-      - GF_LOG_LEVEL=debug
-    volumes:
-      - ./dist:/var/lib/grafana/plugins/arcadedb-arcadedb-datasource
-      - ./provisioning:/etc/grafana/provisioning
-    depends_on:
-      - arcadedb
+    extends:
+      file: .config/docker-compose-base.yaml
+      service: grafana
 
   arcadedb:
     image: arcadedata/arcadedb:latest

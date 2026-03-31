@@ -4,7 +4,7 @@
   "name": "ArcadeDB",
   "id": "arcadedb-arcadedb-datasource",
   "backend": true,
-  "executable": "gpx_arcadedb-arcadedb-datasource",
+  "executable": "gpx_arcadedb",
   "alerting": true,
   "annotations": true,
   "info": {
@@ -40,10 +40,11 @@
         "url": "https://github.com/ArcadeData/arcadedb"
       }
     ],
-    "version": "1.0.0"
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": ">=10.0.0",
+    "grafanaDependency": ">=12.3.0",
     "plugins": []
   }
 }

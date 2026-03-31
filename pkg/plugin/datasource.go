@@ -5,12 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"net/http"
+
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
-	"github.com/grafana/grafana-plugin-sdk-go/data"
-	"net/http"
 )
 
 type Datasource struct {
@@ -131,7 +129,3 @@ func (d *Datasource) queryCommand(ctx context.Context, query backend.DataQuery, 
 	return backend.DataResponse{Frames: frames}
 }
 
-// Ensure we implement the resource handler interface properly
-var _ = httpadapter.New
-var _ = data.NewFrame
-var _ = log.DefaultLogger
