@@ -1,0 +1,16 @@
+apiVersion: 1
+
+datasources:
+  - name: ArcadeDB
+    type: arcadedb-arcadedb-datasource
+    access: proxy
+    url: http://arcadedb:2480
+    basicAuth: true
+    basicAuthUser: root
+    jsonData:
+      database: mydb
+    secureJsonData:
+      basicAuthPassword: arcadedb
+      password: arcadedb
+    isDefault: true
+    editable: true

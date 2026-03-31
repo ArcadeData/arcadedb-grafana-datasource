@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=arcadedb-arcadedb-datasource
+      - GF_LOG_LEVEL=debug
+    volumes:
+      - ./dist:/var/lib/grafana/plugins/arcadedb-arcadedb-datasource
+      - ./provisioning:/etc/grafana/provisioning
+    depends_on:
+      - arcadedb
+
+  arcadedb:
+    image: arcadedata/arcadedb:latest
+    ports:
+      - "2480:2480"
+      - "2424:2424"
+      - "5432:5432"
+    environment:
+      - JAVA_OPTS=-Darcadedb.server.rootPassword=arcadedb -Darcadedb.server.plugins=Postgres:com.arcadedb.postgres.PostgresProtocolPlugin

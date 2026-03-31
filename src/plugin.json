@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "datasource",
+  "name": "ArcadeDB",
+  "id": "arcadedb-arcadedb-datasource",
+  "backend": true,
+  "executable": "gpx_arcadedb-arcadedb-datasource",
+  "alerting": true,
+  "annotations": true,
+  "info": {
+    "description": "ArcadeDB data source plugin for Grafana. Query graph, time series, document, and vector data.",
+    "author": {
+      "name": "Arcade Data Ltd",
+      "url": "https://arcadedb.com"
+    },
+    "keywords": [
+      "arcadedb",
+      "graph",
+      "timeseries",
+      "cypher",
+      "gremlin",
+      "sql",
+      "multi-model"
+    ],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {
+        "name": "ArcadeDB",
+        "url": "https://arcadedb.com"
+      },
+      {
+        "name": "Documentation",
+        "url": "https://docs.arcadedb.com"
+      },
+      {
+        "name": "GitHub",
+        "url": "https://github.com/ArcadeData/arcadedb"
+      }
+    ],
+    "version": "1.0.0"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=10.0.0",
+    "plugins": []
+  }
+}
