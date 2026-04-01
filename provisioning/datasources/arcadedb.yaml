@@ -8,7 +8,7 @@ datasources:
     basicAuth: true
     basicAuthUser: root
     jsonData:
-      database: mydb
+      database: MovieRatings
     secureJsonData:
       basicAuthPassword: arcadedb
       password: arcadedb
