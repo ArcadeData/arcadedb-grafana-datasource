@@ -48,6 +48,11 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 			continue
 		}
 
+		// Default to SQL if no query mode specified
+		if qm.QueryMode == "" {
+			qm.QueryMode = "sql"
+		}
+
 		var resp backend.DataResponse
 		switch qm.QueryMode {
 		case "timeseries":

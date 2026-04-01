@@ -9,6 +9,14 @@ export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
   const { jsonData, secureJsonFields, secureJsonData } = options;
 
+  const onUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onOptionsChange({ ...options, url: event.target.value });
+  };
+
+  const onUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onOptionsChange({ ...options, basicAuthUser: event.target.value, basicAuth: true });
+  };
+
   const onDatabaseChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onOptionsChange({
       ...options,
@@ -19,21 +27,31 @@ export function ConfigEditor(props: Props) {
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onOptionsChange({
       ...options,
-      secureJsonData: { ...secureJsonData, password: event.target.value },
+      basicAuth: true,
+      secureJsonData: { ...secureJsonData, basicAuthPassword: event.target.value, password: event.target.value },
     });
   };
 
   const onPasswordReset = () => {
     onOptionsChange({
       ...options,
-      secureJsonFields: { ...secureJsonFields, password: false },
-      secureJsonData: { ...secureJsonData, password: '' },
+      secureJsonFields: { ...secureJsonFields, basicAuthPassword: false, password: false },
+      secureJsonData: { ...secureJsonData, basicAuthPassword: '', password: '' },
     });
   };
 
   return (
     <>
       <h3 className="page-heading">ArcadeDB Connection</h3>
+
+      <InlineField label="URL" labelWidth={20} tooltip="ArcadeDB server HTTP URL (e.g. http://localhost:2480)">
+        <Input
+          width={40}
+          value={options.url || ''}
+          onChange={onUrlChange}
+          placeholder="http://localhost:2480"
+        />
+      </InlineField>
 
       <InlineField label="Database" labelWidth={20} tooltip="ArcadeDB database name">
         <Input
@@ -44,10 +62,19 @@ export function ConfigEditor(props: Props) {
         />
       </InlineField>
 
-      <InlineField label="Password" labelWidth={20} tooltip="ArcadeDB password (username is set in the HTTP Auth section above)">
+      <InlineField label="Username" labelWidth={20} tooltip="ArcadeDB username">
+        <Input
+          width={40}
+          value={options.basicAuthUser || ''}
+          onChange={onUsernameChange}
+          placeholder="root"
+        />
+      </InlineField>
+
+      <InlineField label="Password" labelWidth={20} tooltip="ArcadeDB password">
         <SecretInput
           width={40}
-          isConfigured={secureJsonFields?.password}
+          isConfigured={secureJsonFields?.basicAuthPassword || secureJsonFields?.password}
           value={secureJsonData?.password || ''}
           onChange={onPasswordChange}
           onReset={onPasswordReset}

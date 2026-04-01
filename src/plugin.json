@@ -3,6 +3,7 @@
   "type": "datasource",
   "name": "ArcadeDB",
   "id": "arcadedb-arcadedb-datasource",
+  "metrics": true,
   "backend": true,
   "executable": "gpx_arcadedb",
   "alerting": true,
