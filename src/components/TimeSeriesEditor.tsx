@@ -24,7 +24,6 @@ export function TimeSeriesEditor({ query, onChange, onRunQuery, datasource }: Pr
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
     datasource
       .getMetadata()
       .then(setMetadata)

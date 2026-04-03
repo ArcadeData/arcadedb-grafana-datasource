@@ -40,6 +40,7 @@ export interface ArcadeDBDataSourceOptions extends DataSourceJsonData {
 
 export interface ArcadeDBSecureJsonData {
   password?: string;
+  basicAuthPassword?: string;
 }
 
 // Metadata response from /grafana/metadata
