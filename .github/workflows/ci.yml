@@ -1,32 +1,68 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
+  push:
     branches: [main]
 
 jobs:
   frontend:
+    name: Frontend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
+
       - run: npm ci
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run test:ci
-      - run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npx jest --maxWorkers 4 --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT_DIR: reports
+          JEST_JUNIT_OUTPUT_NAME: jest-results.xml
+
+      - name: Test Report
+        uses: dorny/test-reporter@a6ddd83ac95ff4586f5d3aceeb314d9a1841db95 # v3.0.0
+        if: always()
+        with:
+          name: Frontend Tests
+          path: reports/jest-results.xml
+          reporter: jest-junit
 
   backend:
+    name: Backend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
-          go-version: '1.21'
-      - run: go test -race ./pkg/...
-      - run: go vet ./pkg/...
+          go-version-file: go.mod
+          cache: true
+
+      - name: Vet
+        run: go vet ./pkg/...
+
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@latest
+
+      - name: Test
+        run: gotestsum --junitfile reports/go-results.xml -- -race -v ./pkg/... -timeout 300s
+
+      - name: Test Report
+        uses: dorny/test-reporter@a6ddd83ac95ff4586f5d3aceeb314d9a1841db95 # v3.0.0
+        if: always()
+        with:
+          name: Backend Tests
+          path: reports/go-results.xml
+          reporter: java-junit

@@ -78,3 +78,29 @@ func TestExpandMacros_NoMacros(t *testing.T) {
 		t.Errorf("expected no changes, got %q", result)
 	}
 }
+
+func TestExpandMacros_AllMacrosInSameQuery(t *testing.T) {
+	tr := backend.TimeRange{
+		From: time.UnixMilli(1000),
+		To:   time.UnixMilli(5000),
+	}
+	query := "SELECT * FROM t WHERE $__timeFilter(ts) AND created >= $__timeFrom AND created <= $__timeTo GROUP BY BUCKET $__interval"
+	result := ExpandMacros(query, tr, 5*time.Minute)
+	expected := "SELECT * FROM t WHERE ts >= 1000 AND ts <= 5000 AND created >= 1000 AND created <= 5000 GROUP BY BUCKET 5m"
+	if result != expected {
+		t.Errorf("expected:\n%s\ngot:\n%s", expected, result)
+	}
+}
+
+func TestExpandMacros_RepeatedMacro(t *testing.T) {
+	tr := backend.TimeRange{
+		From: time.UnixMilli(1000),
+		To:   time.UnixMilli(5000),
+	}
+	query := "SELECT $__timeFrom, $__timeFrom"
+	result := ExpandMacros(query, tr, time.Minute)
+	expected := "SELECT 1000, 1000"
+	if result != expected {
+		t.Errorf("expected %q, got %q", expected, result)
+	}
+}
