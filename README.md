@@ -235,11 +235,84 @@ npm run dev
 mage -v build:linux   # or build:darwin
 
 # Run tests
-npm run test          # Frontend tests
+npm run test          # Frontend tests (watch mode)
 go test ./pkg/...     # Backend tests
 ```
 
 Grafana is available at http://localhost:3000 (admin/admin) with the plugin auto-configured.
+
+### Running Tests
+
+#### Frontend (Jest + React Testing Library)
+
+```bash
+# Watch mode - reruns tests on file changes (useful during development)
+npm run test
+
+# Single run - all tests, no watch (used in CI)
+npm run test:ci
+
+# Run a specific test file
+npx jest src/components/QueryEditor.test.tsx
+
+# Run tests matching a pattern
+npx jest --testPathPattern="TimeSeries"
+```
+
+Frontend tests cover:
+- Component rendering and user interactions (`src/components/*.test.tsx`)
+- DataSource class behavior (`src/datasource.test.ts`)
+
+Tests use mocked Grafana runtime dependencies. No running Grafana or ArcadeDB instance is needed.
+
+#### Backend (Go)
+
+```bash
+# Run all backend tests
+go test ./pkg/...
+
+# With race detector (matches CI)
+go test -race -v ./pkg/... -timeout 300s
+
+# Run a specific test file or function
+go test -run TestMacroExpansion ./pkg/plugin/
+
+# With verbose output
+go test -v ./pkg/plugin/
+```
+
+Backend tests cover:
+- ArcadeDB HTTP client (`arcadedb_client_test.go`)
+- Time series query building (`timeseries_test.go`)
+- SQL/Cypher/Gremlin command handling (`command_test.go`)
+- Node Graph frame conversion (`nodegraph_test.go`)
+- Macro expansion (`macros_test.go`)
+- DataSource health check and query routing (`datasource_test.go`)
+
+Tests use testcontainers to run a real ArcadeDB instance. Docker must be running.
+
+#### Linting and Type Checking
+
+```bash
+# TypeScript type checking
+npm run typecheck
+
+# ESLint
+npm run lint
+
+# Auto-fix lint and formatting issues
+npm run lint:fix
+
+# Go vet
+go vet ./pkg/...
+```
+
+#### CI
+
+The CI pipeline (`.github/workflows/ci.yml`) runs on every PR and push to `main`. It executes:
+
+- **Frontend job**: `npm ci`, typecheck, lint, `npm run test:ci`
+- **Backend job**: `go vet`, `go test -race`
 
 ### Project Structure
 

@@ -228,6 +228,24 @@ Applied to raw query strings before sending to ArcadeDB:
 
 ## Testing Strategy
 
-- **Go unit tests**: use `httptest.NewServer` to mock ArcadeDB responses. Test request construction, response parsing, macro expansion, Node Graph frame building.
-- **Frontend tests**: use Jest + React Testing Library. Test component rendering, mode switching, config validation.
-- **Integration**: `docker compose up` provides a real ArcadeDB + Grafana environment for manual verification.
+### Go Backend Tests (testcontainers)
+
+Tests run against a real ArcadeDB instance managed by testcontainers. A single container is started via `TestMain` in `testutil_test.go` and shared across all test functions in the package. Docker must be running.
+
+- Each test creates its own database with `uniqueDBName()` and defers cleanup with `DropDatabase()` for isolation.
+- Use `testArcadeDB.NewTestClient(db)` to get a client pointed at the test instance.
+- Use `testArcadeDB.ExecuteCommand(db, language, command)` to set up test data.
+- Do not use `httptest.NewServer` or mock HTTP responses. All backend tests hit the real ArcadeDB API.
+- Test files live alongside their source: `pkg/plugin/*_test.go`.
+
+### Frontend Tests (Jest + React Testing Library)
+
+Tests run in jsdom with mocked Grafana runtime dependencies. No running backend needed.
+
+- Mock `@grafana/ui` components as simple HTML elements (see `QueryEditor.test.tsx` for the pattern). Use `data-testid` attributes for querying.
+- Mock `@grafana/runtime` to stub `DataSourceWithBackend` and `getTemplateSrv` (see `datasource.test.ts` for the pattern).
+- Mock child editor components as stubs when testing the parent `QueryEditor` (e.g., `jest.mock('./SqlEditor', ...)`).
+- Use a `makeProps()` or `createDataSource()` helper to build test fixtures with sensible defaults and allow overrides.
+- Use `jest.fn()` for `onChange` and `onRunQuery` callbacks, then assert they were called with expected arguments.
+- Test files live next to their source: `src/**/*.test.ts(x)`.
+- Run `npm run test:ci` (not `npm run test`) for single-run execution in CI or before committing.
