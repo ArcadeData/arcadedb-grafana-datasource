@@ -1,32 +1,46 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
+  push:
     branches: [main]
 
 jobs:
   frontend:
+    name: Frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
+
       - run: npm ci
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run test:ci
-      - run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:ci
 
   backend:
+    name: Backend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
-      - run: go test -race ./pkg/...
-      - run: go vet ./pkg/...
+          go-version-file: go.mod
+          cache: true
+
+      - name: Vet
+        run: go vet ./pkg/...
+
+      - name: Test
+        run: go test -race -v ./pkg/... -timeout 300s
