@@ -33,6 +33,9 @@ artifacts/
 work/
 ci/
 
+# Test reports
+reports/
+
 # e2e test directories
 /test-results/
 /playwright-report/
