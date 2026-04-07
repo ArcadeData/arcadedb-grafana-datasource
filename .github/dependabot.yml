@@ -27,3 +27,17 @@ updates:
       interval: weekly
       day: sunday
     open-pull-requests-limit: 10
+
+  - package-ecosystem: docker-compose
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: sunday
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: docker-compose
+    directory: "/.config"
+    schedule:
+      interval: weekly
+      day: sunday
+    open-pull-requests-limit: 10
