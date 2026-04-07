@@ -44,6 +44,9 @@ func TestMain(m *testing.M) {
 		},
 		WaitingFor: wait.ForHTTP("/api/v1/ready").
 			WithPort("2480/tcp").
+			WithStatusCodeMatcher(func(status int) bool {
+				return status == http.StatusOK || status == http.StatusNoContent
+			}).
 			WithStartupTimeout(60 * time.Second),
 	}
 
