@@ -19,7 +19,7 @@ import (
 var testArcadeDB *TestArcadeDB
 
 const (
-	arcadeDBImage    = "arcadedata/arcadedb:latest"
+	arcadeDBImage    = "arcadedata/arcadedb:26.3.2"
 	arcadeDBPort     = "2480/tcp"
 	arcadeDBUser     = "root"
 	arcadeDBPassword = "playwithdata"
