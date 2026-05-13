@@ -10,6 +10,10 @@ on:
         description: 'Skip GitHub release upload (build/sign/validate only)'
         type: boolean
         default: true
+      skip_sign:
+        description: 'Skip signing (use for first-time catalog submission before org/prefix is registered)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -76,7 +80,7 @@ jobs:
           mv dist/plugin.json.tmp dist/plugin.json
 
       - name: Sign plugin
-        if: env.GRAFANA_ACCESS_POLICY_TOKEN != ''
+        if: env.GRAFANA_ACCESS_POLICY_TOKEN != '' && inputs.skip_sign != true
         run: npx --yes @grafana/sign-plugin@latest
 
       - name: Package zip
