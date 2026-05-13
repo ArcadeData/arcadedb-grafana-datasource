@@ -13,6 +13,7 @@
     "lint": "eslint --cache .",
     "lint:fix": "npm run lint -- --fix && prettier --write --list-different .",
     "e2e": "playwright test",
+    "screenshots": "playwright test e2e/screenshots.spec.ts",
     "server": "docker compose up --build",
     "sign": "npx --yes @grafana/sign-plugin@latest"
   },
