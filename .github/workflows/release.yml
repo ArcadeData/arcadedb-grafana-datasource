@@ -1,0 +1,121 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Skip GitHub release upload (build/sign/validate only)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, sign, and release
+    runs-on: ubuntu-latest
+    env:
+      GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'npm'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION="0.0.0-dev.${GITHUB_SHA::7}"
+          fi
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "today=$(date -u +%Y-%m-%d)" >> "${GITHUB_OUTPUT}"
+
+      - name: Install npm deps
+        run: npm ci
+
+      - name: Frontend gates
+        run: |
+          npm run typecheck
+          npm run lint
+          npm run test:ci
+
+      - name: Backend tests
+        run: go test -race -v ./pkg/... -timeout 300s
+
+      - name: Frontend build
+        run: npm run build
+
+      - name: Backend build
+        run: |
+          go install github.com/magefile/mage@latest
+          mage -v
+
+      - name: Substitute version and date in plugin.json
+        run: |
+          jq --arg v "${{ steps.version.outputs.version }}" \
+             --arg d "${{ steps.version.outputs.today }}" \
+             '.info.version = $v | .info.updated = $d' \
+             dist/plugin.json > dist/plugin.json.tmp
+          mv dist/plugin.json.tmp dist/plugin.json
+
+      - name: Sign plugin
+        if: env.GRAFANA_ACCESS_POLICY_TOKEN != ''
+        run: npx --yes @grafana/sign-plugin@latest
+
+      - name: Package zip
+        id: package
+        run: |
+          PLUGIN_ID=$(jq -r .id dist/plugin.json)
+          VERSION="${{ steps.version.outputs.version }}"
+          STAGING="$(mktemp -d)/${PLUGIN_ID}"
+          mkdir -p "${STAGING}"
+          cp -r dist/. "${STAGING}/"
+          ZIP_NAME="${PLUGIN_ID}-${VERSION}.zip"
+          (cd "$(dirname "${STAGING}")" && zip -r "${GITHUB_WORKSPACE}/${ZIP_NAME}" "${PLUGIN_ID}")
+          echo "zip=${ZIP_NAME}" >> "${GITHUB_OUTPUT}"
+
+      - name: Validate plugin
+        run: |
+          npx --yes @grafana/plugin-validator@latest \
+            -sourceCodeUri file://. \
+            "${{ steps.package.outputs.zip }}"
+
+      - name: Generate sha1
+        run: sha1sum "${{ steps.package.outputs.zip }}" > "${{ steps.package.outputs.zip }}.sha1"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-${{ steps.version.outputs.version }}
+          path: |
+            ${{ steps.package.outputs.zip }}
+            ${{ steps.package.outputs.zip }}.sha1
+          if-no-files-found: error
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ steps.package.outputs.zip }}
+            ${{ steps.package.outputs.zip }}.sha1
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}

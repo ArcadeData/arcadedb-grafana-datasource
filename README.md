@@ -44,7 +44,7 @@ Convenient macros for time-range interpolation in SQL, Cypher, and Gremlin queri
 
 ## Requirements
 
-- Grafana 10.0 or later
+- Grafana 12.3.0 or later
 - ArcadeDB 24.x or later with HTTP API enabled
 
 ## Installation
@@ -208,14 +208,13 @@ The Go backend communicates with ArcadeDB via its REST API:
 | `GET /api/v1/ts/{db}/grafana/metadata` | Time series type/field/tag discovery |
 | `POST /api/v1/ts/{db}/grafana/query` | Time series DataFrame queries |
 | `POST /api/v1/command/{db}` | SQL, Cypher, Gremlin commands |
-| `POST /api/v1/query/{db}` | Read-only queries |
 
 ## Development
 
 ### Prerequisites
 
-- Node.js 18+
-- Go 1.21+
+- Node.js 22+
+- Go 1.25+
 - [Mage](https://magefile.org/) (Go build tool)
 - Docker and Docker Compose (for the dev environment)
 

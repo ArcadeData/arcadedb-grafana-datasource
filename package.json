@@ -13,12 +13,14 @@
     "lint": "eslint --cache .",
     "lint:fix": "npm run lint -- --fix && prettier --write --list-different .",
     "e2e": "playwright test",
+    "screenshots": "playwright test e2e/screenshots.spec.ts",
     "server": "docker compose up --build",
     "sign": "npx --yes @grafana/sign-plugin@latest"
   },
   "devDependencies": {
     "@grafana/eslint-config": "^9.0.0",
     "@grafana/tsconfig": "^2.1.0",
+    "@playwright/test": "^1.60.0",
     "@stylistic/eslint-plugin-ts": "^4.4.0",
     "@swc/core": "^1.15.24",
     "@swc/helpers": "^0.5.21",
