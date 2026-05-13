@@ -27,6 +27,13 @@
       "small": "img/logo.svg",
       "large": "img/logo.svg"
     },
+    "screenshots": [
+      { "name": "Configuration",       "path": "img/screenshots/config.png" },
+      { "name": "Time Series",         "path": "img/screenshots/timeseries.png" },
+      { "name": "SQL",                 "path": "img/screenshots/sql.png" },
+      { "name": "Cypher Node Graph",   "path": "img/screenshots/cypher.png" },
+      { "name": "Gremlin Node Graph",  "path": "img/screenshots/gremlin.png" }
+    ],
     "links": [
       {
         "name": "ArcadeDB",
