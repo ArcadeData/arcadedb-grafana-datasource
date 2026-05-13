@@ -50,3 +50,8 @@ reports/
 
 # OS
 .DS_Store
+
+# Release packaging
+*.zip
+*.sha1
+MANIFEST.txt

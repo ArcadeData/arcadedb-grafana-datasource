@@ -44,7 +44,7 @@ Convenient macros for time-range interpolation in SQL, Cypher, and Gremlin queri
 
 ## Requirements
 
-- Grafana 10.0 or later
+- Grafana 12.3.0 or later
 - ArcadeDB 24.x or later with HTTP API enabled
 
 ## Installation
