@@ -79,6 +79,13 @@ jobs:
              dist/plugin.json > dist/plugin.json.tmp
           mv dist/plugin.json.tmp dist/plugin.json
 
+      - name: Sync package.json version
+        # The plugin validator requires package.json version == plugin.json version.
+        run: |
+          jq --arg v "${{ steps.version.outputs.version }}" \
+             '.version = $v' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
       - name: Sign plugin
         if: env.GRAFANA_ACCESS_POLICY_TOKEN != '' && inputs.skip_sign != true
         run: npx --yes @grafana/sign-plugin@latest
