@@ -344,4 +344,4 @@ docker-compose.yaml          # Dev environment
 
 ## License
 
-Apache License 2.0. See [LICENSE](LICENSE) for details.
+Apache License 2.0. See [LICENSE](https://github.com/ArcadeData/arcadedb-grafana-datasource/blob/main/LICENSE) for details.
