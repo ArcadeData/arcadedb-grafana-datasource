@@ -14,7 +14,8 @@ async function login(page: Page) {
   await page.fill('input[name="password"]', 'admin');
   await page.click('button[type="submit"]');
   // Skip the "change password" prompt if it appears.
-  const skip = page.getByRole('link', { name: /skip/i });
+  // Grafana renders this as either a link or a button depending on version.
+  const skip = page.locator('a, button').filter({ hasText: /skip/i }).first();
   if (await skip.isVisible().catch(() => false)) {
     await skip.click();
   }
