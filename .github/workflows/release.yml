@@ -17,6 +17,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 jobs:
   release:
@@ -42,11 +44,17 @@ jobs:
 
       - name: Resolve version
         id: version
+        # package.json is the single source of truth for the plugin version.
+        # On tag push we additionally verify the tag matches package.json so a
+        # release can never publish a tag/source-version mismatch.
         run: |
+          VERSION=$(jq -r '.version' package.json)
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            VERSION="${GITHUB_REF#refs/tags/v}"
-          else
-            VERSION="0.0.0-dev.${GITHUB_SHA::7}"
+            TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+            if [[ "${TAG_VERSION}" != "${VERSION}" ]]; then
+              echo "::error::Tag v${TAG_VERSION} does not match package.json version ${VERSION}. Bump package.json before tagging."
+              exit 1
+            fi
           fi
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
           echo "today=$(date -u +%Y-%m-%d)" >> "${GITHUB_OUTPUT}"
@@ -71,20 +79,15 @@ jobs:
           go install github.com/magefile/mage@latest
           mage -v
 
-      - name: Substitute version and date in plugin.json
+      - name: Stamp plugin.json with version and date
+        # plugin.json's version is the same as package.json's; the validator
+        # requires them to match. package.json is the source of truth (committed).
         run: |
           jq --arg v "${{ steps.version.outputs.version }}" \
              --arg d "${{ steps.version.outputs.today }}" \
              '.info.version = $v | .info.updated = $d' \
              dist/plugin.json > dist/plugin.json.tmp
           mv dist/plugin.json.tmp dist/plugin.json
-
-      - name: Sync package.json version
-        # The plugin validator requires package.json version == plugin.json version.
-        run: |
-          jq --arg v "${{ steps.version.outputs.version }}" \
-             '.version = $v' package.json > package.json.tmp
-          mv package.json.tmp package.json
 
       - name: Sign plugin
         # continue-on-error: signing 403s on the first submission because the
@@ -115,6 +118,14 @@ jobs:
 
       - name: Generate sha1
         run: sha1sum "${{ steps.package.outputs.zip }}" > "${{ steps.package.outputs.zip }}.sha1"
+
+      - name: Attest build provenance
+        # Produces a signed SLSA provenance statement for the zip. The validator
+        # flags "no provenance attestation" as a recommendation; this satisfies it.
+        if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{ steps.package.outputs.zip }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

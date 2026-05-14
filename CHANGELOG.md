@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0-beta.2
+
+Resubmission for catalog review.
+
+- Fix `package.json` / `plugin.json` version mismatch flagged by the plugin validator. `package.json` is now the single source of truth for the plugin version.
+- Add SLSA build provenance attestation to the release workflow.
+
 ## 1.0.0-beta.1
 
 First public release of the ArcadeDB data source for Grafana.
