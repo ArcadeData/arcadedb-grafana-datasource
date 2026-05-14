@@ -87,7 +87,12 @@ jobs:
           mv package.json.tmp package.json
 
       - name: Sign plugin
+        # continue-on-error: signing 403s on the first submission because the
+        # arcadedb- ID prefix is not yet registered to a grafana.com org. Once
+        # Grafana accepts the plugin and entitles the org, signing will succeed
+        # and we should remove continue-on-error so failures become loud again.
         if: env.GRAFANA_ACCESS_POLICY_TOKEN != '' && inputs.skip_sign != true
+        continue-on-error: true
         run: npx --yes @grafana/sign-plugin@latest
 
       - name: Package zip
