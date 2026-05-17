@@ -123,7 +123,7 @@ jobs:
         # Produces a signed SLSA provenance statement for the zip. The validator
         # flags "no provenance attestation" as a recommendation; this satisfies it.
         if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: ${{ steps.package.outputs.zip }}
 
