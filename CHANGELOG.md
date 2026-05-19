@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-beta.3
+
+- Attach the SLSA provenance bundle (`*.intoto.jsonl`) as a release asset so the plugin validator can verify the build without GitHub API access. Addresses the catalog's no-provenance-attestation recommendation.
+
 ## 1.0.0-beta.2
 
 Resubmission for catalog review.

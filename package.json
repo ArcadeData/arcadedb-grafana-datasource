@@ -1,6 +1,6 @@
 {
   "name": "arcadedb-arcadedb-datasource",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "ArcadeDB data source plugin for Grafana",
   "author": "Arcade Data Ltd",
   "license": "Apache-2.0",
